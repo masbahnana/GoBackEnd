@@ -10,7 +10,8 @@ vamos criar um servidor HTTP simples que renderize o Hello World! quando navegam
 
 - 1.Na pasta que você criou para a aula crie um arquivo chamado ```http-server.go``` e faça como está abaixo:
 
-```package main
+```
+package main
 import 
 (
   "fmt"
@@ -35,8 +36,32 @@ func main()
     log.Fatal("error starting http server : ", err)
     return
   }
-}```
+}
+```
+
+
 
 - 2. No terminal vá até a pasta onde está o seu código e faça como abaixo:
 
 ```$ go run http-server.go```
+
+
+### Como isso deve funcionar:
+Uma vez executado o programa, um servidor HTTP iniciará escutando localmente na porta ```8080```. Abrindo ```http: // localhost: 8080``` em um navegador exibirá Hello World!
+
+Entenda o que cada linha significa:
+- ```package main```: Isto define o nome do pacote do programa.
+
+- ```import ("fmt" "log" "net / http")```: Este é um comando pré-processador que informa ao compilador Go para incluir todos os arquivos do ```fmt```, ```log``` e o pacote ```net / http```.
+
+- ```const (CONN_HOST = "localhost" CONN_PORT = "8080")```: Declaramos constantes no programa Go usando a palavra-chave ```const```. Aqui declaramos duas constantes - uma é ```CONN_HOST``` com localhost como um valor e outra é ```CONN_PORT``` com ```8080``` como um valor.
+
+- ```func helloWorld (w http.ResponseWriter, r * http.Request) {fmt.Fprintf (w, "Hello World!")}```: Esta é uma função Go que toma ```ResponseWriter``` e Request como uma entrada e escreve ```Hello World!``` em um fluxo de resposta HTTP.
+
+Em seguida, declaramos o método main () de onde a execução do programa começa, já que esse método faz muitas coisas. Vamos entender linha por linha:
+
+- ```http.HandleFunc ("/", helloWorld)```: Aqui, estamos registrando a função ```helloWorld``` com o padrão / URL usando HandleFunc do pacote ```net / http```, o que significa que helloWorld é executado, passando ```(http.ResponseWriter, * http.Request)``` como um parâmetro para ele sempre que acessar o URL HTTP com padrão /.
+
+- ```err: = http.ListenAndServe (CONN_HOST + ":" + CONN_PORT, nil)```: Aqui, estamos chamando ```http.ListenAndServe``` para atender a solicitações HTTP que tratam cada conexão de entrada em um Goroutine separado. O ```ListenAndServe``` aceita dois parâmetros - endereço do servidor e manipulador. Aqui, estamos passando o endereço do servidor como ```localhost: 8080``` e handler como ```nil```, o que significa que estamos solicitando ao servidor que use o ```DefaultServeMux``` como um manipulador.
+
+- ```if err! = nil {log.Fatal ("erro ao iniciar servidor http:", err) return}```: Aqui, verificamos se existe um problema ao iniciar o servidor. Se houver, registre o erro e saia com um código de status ```1```.
