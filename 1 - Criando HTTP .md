@@ -49,7 +49,7 @@ func main()
 ### Como isso deve funcionar:
 Uma vez executado o programa, um servidor HTTP iniciará escutando localmente na porta ```8080```. Abrindo ```http: // localhost: 8080``` em um navegador exibirá Hello World!
 
-####Entenda o que cada linha significa:
+**Entendendo o que escrevemos**
 - ```package main```: Isto define o nome do pacote do programa.
 
 - ```import ("fmt" "log" "net / http")```: Este é um comando pré-processador que informa ao compilador Go para incluir todos os arquivos do ```fmt```, ```log``` e o pacote ```net / http```.
@@ -152,7 +152,7 @@ Content-Type: text/plain; charset=utf-8
 Hello World!
 ```
 
-####Entenda o que cada linha significa:
+**Entendendo o que escrevemos**
 - A função ```import``` adiciona um pacote adicional, ```crypto / subtle```, que usaremos para comparar o nome de usuário e a senha das credenciais inseridas pelo usuário.
 
 - Usando a função ```const```, definimos duas constantes adicionais, ```ADMIN_USER``` e ```ADMIN_PASSWORD```, que serão utilizadas durante a autenticação do usuário.
@@ -240,6 +240,7 @@ func main()
 
 ```$ go run http-server-mux.go```
 
+
 ### Como isso deve funcionar:
 Assim que executarmos o programa, o servidor HTTP começará a escutar localmente na porta ```8080```.
 
@@ -289,6 +290,7 @@ func main()
 - 2.Depois rode o seguinte comando no terminal:
 
 ```$ go run tcp-server.go```
+
 
 ### Como isso deve funcionar:
 Assim que executarmos o programa, o servidor TCP começará a escutar localmente na porta ```8080```.
@@ -372,6 +374,7 @@ func handleRequest(conn net.Conn)
 
 ```$ go run tcp-server-read-data.go```
 
+
 ### Como isso deve funcionar:
 Assim que executarmos o programa, o servidor TCP começará a escutar localmente na porta 8080. A execução de um comando echo a partir da linha de comando da seguinte maneira enviará uma mensagem ao servidor TCP:
 
@@ -402,6 +405,7 @@ func handleRequest(conn net.Conn)
   conn.Close()
 }
 ```
+
 
 ## Escrevendo dados para uma conexão TCP
 Outro cenário comum, bem importante, em qualquer aplicativo da Web é enviar os dados de volta ao cliente ou responder ao cliente. Go fornece uma maneira conveniente de escrever uma mensagem em uma conexão como bytes.
@@ -463,6 +467,7 @@ func handleRequest(conn net.Conn)
 
 ```$ go run tcp-server-write-data.go```
 
+
 #### Como isso deve funcionar:
 Assim que executarmos o programa, o servidor TCP iniciará a escuta local na porta 8080. Execute um comando echo na linha de comando, da seguinte maneira:
 
@@ -482,6 +487,7 @@ func handleRequest (conn net.Conn)
    ...
 }
 ```
+
 
 ## Implementando o roteamento de solicitações HTTP (HTTP request routing)
 Na maioria das vezes, você precisa definir mais de uma rota de URL em um aplicativo da Web, o que envolve o mapeamento do caminho da URL para os manipuladores ou recursos. Nesse passo, aprenderemos como podemos implementá-lo no Go.
@@ -581,7 +587,8 @@ func main()
 }
 ```
 
-##Implementando o roteamento de solicitações HTTP usando o Gorilla Mux
+
+## Implementando o roteamento de solicitações HTTP usando o Gorilla Mux
 O pacote ```net/http``` do Go oferece muitas funcionalidades para o roteamento de URL das solicitações HTTP. Uma coisa que não faz muito bem é o roteamento de URL dinâmico. Felizmente, podemos conseguir isso com o pacote ```gorilla/mux```, que será abordado nessa parte.
 
 Usaremos ```gorilla/mux``` para definir algumas rotas, como fizemos em nossa receita anterior, junto com seus manipuladores ou recursos. Como já vimos antes, para usar pacotes externos, primeiro temos que instalar o pacote usando o comando ```go get``` ou temos que copiá-lo manualmente para ```$ GOPATH/src``` ou ```$ GOPATH```. Nós faremos o mesmo na receita também. Execute os seguintes passos:
@@ -642,7 +649,8 @@ func main()
 
 ```$ go run http-server-gorilla-mux-routing.go```
 
-####Como isso deve funcionar:
+
+#### Como isso deve funcionar:
 Uma vez executado o programa, o servidor HTTP iniciará escutando localmente na porta 8080 e acessando ```http://localhost:8080/```, ```http://localhost:8080/post``` e ```http://localhost:8080/hello/foo``` a partir de um navegador ou linha de comando produzirá a mensagem definida na definição de manipulador correspondente. Por exemplo, execute ```http://localhost:8080/``` na linha de comando, da seguinte maneira:
 
 ```$ curl -X GET -i http://localhost:8080/```
@@ -700,7 +708,8 @@ func main()
 }
 ```
 
-##Registrar solicitações HTTP (Logging HTTP requests)
+
+## Registrar solicitações HTTP (Logging HTTP requests)
 Registrar solicitações HTTP sempre é útil para solucionar problemas de um aplicativo da Web, por isso é uma boa ideia registrar uma ```solicitação/resposta``` ou melhor citando ```response/request``` com um nível de mensagem e registro adequados. O Go fornece o pacote de ```log```, que pode nos ajudar a implementar o log em um aplicativo. No entanto, nesta receita, usaremos os manipuladores de criação de log do Gorilla para implementá-lo, pois a biblioteca oferece mais recursos, como o registro em log do Apache Combined Log Format e Apache Common Log Format, que ainda não são suportados pelo pacote Go ```log```.
 
 Como já criamos um servidor HTTP e definimos rotas usando o Gorilla Mux em nossa receita anterior, vamos atualizá-lo para incorporar os manipuladores de registro do Gorilla.
@@ -778,7 +787,8 @@ func main()
 
 ```$ go run http-server-request-logging.go```
 
-###Como isso deve funcionar:
+
+### Como isso deve funcionar:
 Assim que executarmos o programa, o servidor HTTP começará a escutar localmente na porta ```8080```.
 
 - Execute ```GET``` na linha de comando, da seguinte maneira:
