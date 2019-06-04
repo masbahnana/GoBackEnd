@@ -152,3 +152,82 @@ Aprendemos como depurar um servidor WebSocket que está sendo executado localmen
 
 ### Como isso deve funcionar
 - Selecione WebSocket Remote Debug configuration e clique no botão Debug e irá aparecer a mensagem ```Hello Arpit```
+
+
+## Teste unitário
+**Testes unitários ou desenvolvimento orientado a testes (TDD - test-driven development)** ajudam o desenvolvedor a projetar código acoplado com foco na reutilização de código. Também nos ajuda a perceber quando parar de codificar e fazer alterações rapidamente
+
+- Vamos utilizar o WebSocker server que fizemos antes
+
+- 1.Instale os pacotes ```github.com/gorilla/websocket``` e ```github.com/stretchr/testify/assert``` usando o comando ```go get```
+
+```
+$ go get github.com/gorilla/websocket
+$ go get github.com/stretchr/testify/assert
+```
+
+- 2.Crie ```websocket-server_test.go``` onde criaremos um servidor de teste, conectaremos a ele usando o cliente Gorilla e, eventualmente, leremos e escreveremos mensagens para testar a conexão
+
+```
+package main
+import 
+(
+  "net/http"
+  "net/http/httptest"
+  "strings"
+  "testing"
+  "github.com/gorilla/websocket"
+  "github.com/stretchr/testify/assert"
+)
+func TestWebSocketServer(t *testing.T) 
+{
+  server := httptest.NewServer(http.HandlerFunc
+  (HandleClients))
+  defer server.Close()
+  u := "ws" + strings.TrimPrefix(server.URL, "http")
+  socket, _, err := websocket.DefaultDialer.Dial(u, nil)
+  if err != nil 
+  {
+    t.Fatalf("%v", err)
+  }
+  defer socket.Close()
+  m := Message{Message: "hello"}
+  if err := socket.WriteJSON(&m); err != nil 
+  {
+    t.Fatalf("%v", err)
+  }
+  var message Message
+  err = socket.ReadJSON(&message)
+  if err != nil 
+  {
+    t.Fatalf("%v", err)
+  }
+  assert.Equal(t, "hello", message.Message, "they 
+  should be equal")
+}
+```
+
+### Como isso deve funcionar
+- Execute ```go test```
+
+```
+$ go test websocket-server_test.go websocket-server.go
+ok  command-line-arguments 0.048s
+```
+
+- Isso nos dará a resposta **ok**, o que significa que o teste foi compilado e executado com sucesso
+
+- Vamos ver como fica quando um teste Go falha. Altere a saída esperada na instrução assert para outra coisa. No seguinte ```Hello``` foi alterado para ```Hi```
+
+```
+...
+assert.Equal(t, "hi", message.Message, "they should be equal")
+...
+``` 
+
+- Execute o ```go teste``` de novo
+
+```$ go test websocket-server_test.go websocket-server.go``` 
+
+- Ele nos fornecerá a resposta de falha junto com o rastreio de erro
+
