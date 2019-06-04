@@ -374,3 +374,429 @@ Assim que executarmos o programa, o servidor HTTP começará a escutar localment
 - Finalmente, definimos ```main()``` onde mapeamos todos os manipuladores - ```createCookie``` e ```readCookie``` - para ```/create``` e ```/read```, respectivamente, e iniciamos o servidor HTTP em ```localhost:8080```.
 
 
+## Implementação de cache
+O armazenamento em cache de dados em um aplicativo da Web às vezes é necessário para evitar a solicitação repetida de dados estáticos de um banco de dados ou serviço externo. O Go não fornece nenhum pacote interno para armazenar respostas em cache, mas o suporta por meio de pacotes externos.
+Existem vários pacotes, como ```https://github.com/coocood/freecache``` e ```https://github.com/patrickmn/go-cache```, que podem ajudar na implementação do cache e, nesta parte, usaremos o ```https://github.com/patrickmn/go-cache``` para implementá-lo.
+
+- 1.Instale o pacote ```github.com/patrickmn/go-cache``` usando o comando ```go get```
+
+```$ go get github.com/patrickmn/go-cache```
+
+- 2.Crie ```http-caching.go```, onde criaremos um cache e o preencheremos com dados de inicialização do servidor
+
+```
+package main
+import 
+(
+  "fmt"
+  "log"
+  "net/http"
+  "time"
+  "github.com/patrickmn/go-cache"
+)
+const 
+(
+  CONN_HOST = "localhost"
+  CONN_PORT = "8080"
+)
+var newCache *cache.Cache
+func init() 
+{
+  newCache = cache.New(5*time.Minute, 10*time.Minute)
+  newCache.Set("foo", "bar", cache.DefaultExpiration)
+}
+func getFromCache(w http.ResponseWriter, r *http.Request) 
+{
+  foo, found := newCache.Get("foo")
+  if found 
+  {
+    log.Print("Key Found in Cache with value as :: ", 
+    foo.(string))
+    fmt.Fprintf(w, "Hello "+foo.(string))
+  } 
+  else 
+  {
+    log.Print("Key Not Found in Cache :: ", "foo")
+    fmt.Fprintf(w, "Key Not Found in Cache")
+  }
+}
+func main() 
+{
+  http.HandleFunc("/", getFromCache)
+  err := http.ListenAndServe(CONN_HOST+":"+CONN_PORT, nil)
+  if err != nil 
+  {
+    log.Fatal("error starting http server : ", err)
+    return
+  }
+}
+```
+
+- 3.Rode no terminal
+
+```$ go run http-caching.go```
+
+
+### Como isso deve funcionar
+-  Assim que executarmos o programa, o servidor HTTP começará a escutar localmente na porta 8080
+
+- Na inicialização, a chave com o nome foo com um valor como barra será adicionada ao cache
+
+- Navegar ```http://localhost:8080/``` lerá um valor de chave do cache e o anexará a Hello
+
+- Especificamos o tempo de expiração dos dados do cache em nosso programa como cinco minutos, o que significa que a chave que criamos no cache na inicialização do servidor não estará lá depois de cinco minutos. Portanto, acessar a mesma URL novamente após cinco minutos retornará a chave não encontrada no cache do servidor
+
+**Entendendo as partes**
+- Usando ```var newCache * cache.Cache```, declaramos um cache privado
+
+- Em seguida, atualizamos a função ```init()``` onde criamos um cache com cinco minutos de tempo de expiração e 10 minutos de intervalo de limpeza, e adicionamos um item ao cache com uma chave como ```foo``` com seu valor como bar e seu valor de expiração como 0 , o que significa que queremos usar o tempo de expiração padrão do cache
+> Se a duração da expiração for menor que um (ou ```NoExpiration```), os itens no cache nunca expiram (por padrão) e devem ser excluídos manualmente. Se o intervalo de limpeza for menor que um, os itens expirados não serão excluídos do cache antes de chamar ```c.DeleteExpired()```
+
+- Definimos o manipulador ```getFromCache``` onde recuperamos o valor de uma chave do cache. Se encontrado, nós o escrevemos em uma resposta HTTP; caso contrário, gravamos a mensagem ```Chave não encontrada``` | ```Key Not Found in Cache``` no cache em uma resposta HTTP
+
+
+## Implementando o tratamento de erros HTTP no Go (HTTP error handling in Go)
+A implementação do tratamento de erros em qualquer aplicativo da Web é um dos principais aspectos, pois ajuda na solução de problemas e na correção de erros mais rapidamente. Manipulação de erros significa sempre que um erro ocorre em um aplicativo, ele deve ser registrado em algum lugar, em um arquivo ou em um banco de dados com a mensagem de erro adequada, junto com o rastreamento de pilha.
+Em Go, pode ser implementado de várias maneiras. Uma maneira é escrever manipuladores personalizados.
+
+- 1.Instale o pacote ```github.com/gorilla/mux``` usando o comando ```go get```
+
+```$ go get github.com/gorilla/mux```
+
+- 2.Crie ```http-error-handling.go```, onde criaremos um manipulador personalizado que atua como um ```wrapper``` para lidar com todas as solicitações HTTP
+
+```
+package main
+import 
+(
+  "errors"
+  "fmt"
+  "log"
+  "net/http"
+  "strings"
+  "github.com/gorilla/mux"
+)
+const 
+(
+  CONN_HOST = "localhost"
+  CONN_PORT = "8080"
+)
+type NameNotFoundError struct 
+{
+  Code int
+  Err error
+}
+func (nameNotFoundError NameNotFoundError) Error() string 
+{
+  return nameNotFoundError.Err.Error()
+}
+type WrapperHandler func(http.ResponseWriter, *http.Request) 
+error
+func (wrapperHandler WrapperHandler) ServeHTTP(w http.
+ResponseWriter, r *http.Request) 
+{
+  err := wrapperHandler(w, r)
+  if err != nil 
+  {
+    switch e := err.(type) 
+    {
+      case NameNotFoundError:
+      log.Printf("HTTP %s - %d", e.Err, e.Code)
+      http.Error(w, e.Err.Error(), e.Code)
+      default:
+      http.Error(w, http.StatusText(http.
+      StatusInternalServerError),
+      http.StatusInternalServerError)
+    }
+  }
+}
+func getName(w http.ResponseWriter, r *http.Request) error 
+{
+  vars := mux.Vars(r)
+  name := vars["name"]
+  if strings.EqualFold(name, "foo") 
+  {
+    fmt.Fprintf(w, "Hello "+name)
+    return nil
+  } 
+  else 
+  {
+    return NameNotFoundError{500, errors.New("Name Not Found")}
+  }
+}
+func main() 
+{
+  router := mux.NewRouter()
+  router.Handle("/employee/get/{name}",
+  WrapperHandler(getName)).Methods("GET")
+  err := http.ListenAndServe(CONN_HOST+":"+CONN_PORT, router)
+  if err != nil 
+  {
+    log.Fatal("error starting http server : ", err)
+    return
+  }
+}
+```
+
+- 3.Rode no terminal
+
+```$ go run http-error-handling.go```
+
+
+### Como isso deve funcionar
+- Assim que executarmos o programa, o servidor HTTP começará a escutar localmente na porta 8080
+
+- Em seguida, navegando ```http://localhost:8080/employee/get/foo``` nos dará o Hello, seguido pelo nome do funcionário com o código de status como 200, como uma resposta no navegador
+
+- Acessando ```http://localhost:8080/employee/get/bar``` nos retornará um erro HTTP com a mensagem ```Name Not Found``` e um código de erro de 500
+
+**Entendendo as partes**
+- Definimos uma estrutura ```NameNotFoundError``` com dois campos - Código do tipo int e erro do tipo error, que representa um erro com um código de status HTTP associado
+
+```
+type NameNotFoundError struct 
+{
+  Code int
+  Err error
+}
+```
+- Permitimos que ```NameNotFoundError``` satisfizesse a interface de erro
+
+```
+func (nameNotFoundError NameNotFoundError) Error() string 
+{
+  return nameNotFoundError.Err.Error()
+}
+```
+
+- Em seguida, definimos um tipo ```WrapperHandler``` definido pelo usuário, que é uma função Go que aceita qualquer manipulador que aceita ```func (http.ResponseWriter, * http.Request)``` como parâmetros de entrada e retorna um erro
+
+- Em seguida, definimos um manipulador ```ServeHTTP```, que chama um manipulador que passamos para ```WrapperHandler passing (http.ResponseWriter, * http.Request)``` como parâmetros para ele e verifica se há algum erro retornado pelo manipulador. Se houver, então os manipulará apropriadamente usando o caso de troca
+
+```
+if err != nil 
+{
+  switch e := err.(type) 
+  {
+    case NameNotFoundError:
+    log.Printf("HTTP %s - %d", e.Err, e.Code)
+    http.Error(w, e.Err.Error(), e.Code)
+    default:
+    http.Error(w, http.StatusText(http.
+    StatusInternalServerError),
+    http.StatusInternalServerError)
+  }
+}
+```
+
+- Definimos um manipulador ```getName```, que extrai variáveis de caminho de solicitação, obtém o valor da variável ```name``` e verifica se o nome corresponde a ```foo```. Em caso afirmativo, ele escreve Hello, seguido do nome, para uma resposta HTTP; caso contrário, ele retornará uma estrutura ```NameNotFoundError``` com um valor de campo Código de 500 e um valor de campo err de um erro com o texto Nome não encontrado ```(Name not found)```
+
+Finalmente, definimos ```main()```, onde registramos ```WrapperHandler``` como um manipulador a ser chamado para o padrão de URL ```como /get/{name}```
+
+## Implementando login e logout no aplicativo da web
+Sempre que queremos que um aplicativo seja acessado por usuários registrados, precisamos implementar um mecanismo que solicite as credenciais do usuário antes de permitir que eles visualizem quaisquer páginas da Web
+
+Como já criamos um formulário HTML em uma de nossas receitas anteriores, vamos apenas atualizá-lo para implementar mecanismos de login e logout usando o pacote ```gorilla/securecookie```
+
+- 1.Instale ```github.com/gorilla/mux``` e ```github.com/gorilla/securecookie``` usando o comando ```go get```
+
+```
+$ go get github.com/gorilla/mux
+$ go get github.com/gorilla/securecookie
+```
+
+- 2.Crie ```home.html``` dentro do diretório de templates
+
+```$ mkdir templates && cd templates && touch home.html```
+
+- 3.Copie o conteúdo para ```home.html```
+
+```
+<html>
+  <head>
+    <title></title>
+  </head>
+  <body>
+    <h1>Welcome {{.userName}}!</h1>
+    <form method="post" action="/logout">
+      <button type="submit">Logout</button>
+    </form>
+  </body>
+</html>
+```
+
+> No modelo anterior, definimos um marcador, ```{{.userName}}```, cujos valores serão substituídos pelo mecanismo de modelo no tempo de execução e um botão Logout. Ao clicar no botão Logout, o cliente fará uma chamada POST para uma ação de formulário, que é ```/logout```
+
+- 4.Crie ```html-form-login-logout.go```, onde analisaremos o formulário de login, leremos o campo de nome de usuário e definiremos um cookie de sessão quando um usuário clicar no botão Login. Também limpamos a sessão quando um usuário clica no botão Logout
+
+```
+package main
+import 
+(
+  "html/template"
+  "log"
+  "net/http"
+  "github.com/gorilla/mux"
+  "github.com/gorilla/securecookie"
+)
+const 
+(
+  CONN_HOST = "localhost"
+  CONN_PORT = "8080"
+)
+var cookieHandler = securecookie.New
+(
+  securecookie.GenerateRandomKey(64),
+  securecookie.GenerateRandomKey(32)
+)
+func getUserName(request *http.Request) (userName string) 
+{
+  cookie, err := request.Cookie("session")
+  if err == nil 
+  {
+    cookieValue := make(map[string]string)
+    err = cookieHandler.Decode("session", cookie.Value,
+    &cookieValue)
+    if err == nil 
+    {
+      userName = cookieValue["username"]
+    }
+  }
+  return userName
+}
+func setSession(userName string, response http.ResponseWriter) 
+{
+  value := map[string]string
+  {
+    "username": userName,
+  }
+  encoded, err := cookieHandler.Encode("session", value)
+  if err == nil 
+  {
+    cookie := &http.Cookie
+    {
+      Name: "session",
+      Value: encoded,
+      Path: "/",
+    }
+    http.SetCookie(response, cookie)
+  }
+}
+func clearSession(response http.ResponseWriter) 
+{
+  cookie := &http.Cookie
+  {
+    Name: "session",
+    Value: "",
+    Path: "/",
+    MaxAge: -1,
+  }
+  http.SetCookie(response, cookie)
+}
+func login(response http.ResponseWriter, request *http.Request) 
+{
+  username := request.FormValue("username")
+  password := request.FormValue("password")
+  target := "/"
+  if username != "" && password != "" 
+  {
+    setSession(username, response)
+    target = "/home"
+  }
+  http.Redirect(response, request, target, 302)
+}
+func logout(response http.ResponseWriter, request *http.Request) 
+{
+  clearSession(response)
+  http.Redirect(response, request, "/", 302)
+}
+func loginPage(w http.ResponseWriter, r *http.Request) 
+{
+  parsedTemplate, _ := template.ParseFiles("templates/
+  login-form.html")
+  parsedTemplate.Execute(w, nil)
+}
+func homePage(response http.ResponseWriter, request *http.Request) 
+{
+  userName := getUserName(request)
+  if userName != "" 
+  {
+    data := map[string]interface{}
+    {
+      "userName": userName,
+    }
+    parsedTemplate, _ := template.ParseFiles("templates/home.html")
+    parsedTemplate.Execute(response, data)
+  } 
+  else 
+  {
+    http.Redirect(response, request, "/", 302)
+  }
+}
+func main() 
+{
+  var router = mux.NewRouter()
+  router.HandleFunc("/", loginPage)
+  router.HandleFunc("/home", homePage)
+  router.HandleFunc("/login", login).Methods("POST")
+  router.HandleFunc("/logout", logout).Methods("POST")
+  http.Handle("/", router)
+  err := http.ListenAndServe(CONN_HOST+":"+CONN_PORT, nil)
+  if err != nil 
+  {
+    log.Fatal("error starting http server : ", err)
+    return
+  }
+}
+```
+
+- 5.Rode no terminal
+
+```$ go run html-form-login-logout.go```
+
+
+### Como isso deve funcionar
+- Assim que executarmos o programa, o servidor HTTP começará a escutar localmente na porta ```8080```.
+
+- Em seguida, navegando ```http://localhost:8080``` nos mostrará o formulário de login
+
+- Submetendo o formulário depois de digitar o nome de usuário Foo e uma senha aleatória irá renderizar o **Welcome Foo!** mensagem no navegador e crie um cookie com a sessão ```name```, que gerencia o estado de ```login/logout```
+
+- Agora, todas as solicitações subsequentes para ```http://localhost:8080/home``` exibirão o Welcome Foo! mensagem no navegador até que o cookie com o nome da sessão exista
+
+- Em seguida, acessar ```http://localhost:8080/home``` depois de limpar o cookie nos redirecionará para ```http://localhost:8080/``` e nos mostrará o formulário de login
+
+**Entendendo as partes**
+- Usando ```var cookieHandler = securecookie.New (securecookie.GenerateRandomKey (64), securecookie.GenerateRandomKey (32))```, estamos criando um cookie seguro, passando uma chave de hash como o primeiro argumento e uma chave de bloco como o segundo argumento. A chave hash é usada para autenticar valores usando o HMAC e a chave de bloqueio é usada para criptografar valores
+
+- Definimos um manipulador ```getUserName```, onde obtemos um cookie da solicitação HTTP, inicializamos um mapa ```cookieValue``` de chaves de string para valores de string, decodificamos um cookie e obtemos um valor para o nome de usuário e retorno
+
+- Definimos um manipulador ```setSession```, onde criamos e inicializamos um mapa com a chave e valor como username, serializamos, assinamos com um código de autenticação de mensagem, codificamos usando um manipulador ```cookieHandler.Encode```, criamos um novo cookie HTTP e gravá-lo em um fluxo de resposta HTTP
+
+- Definimos ```clearSession```, que basicamente define o valor do cookie como vazio e o grava em um fluxo de resposta HTTP
+
+- Um manipulador de ```login```, onde obtemos um nome de usuário e senha de um formulário HTTP, verificamos se ambos não estão vazios, depois chamamos um manipulador ```setSession``` e redirecionamos para ```/home```, caso contrário, redirecionamos para o URL raiz /
+
+- ```Logout``` handler, onde limpamos os valores da sessão chamando o manipulador ```clearSession``` e redirecionamos para a URL raiz
+
+- ```loginPage```, onde analisamos ```login-form.html```, retorna um novo modelo com o nome e seu conteúdo, chama o manipulador ```Execute``` em um modelo analisado, que gera saída HTML e grava-o em um fluxo de resposta HTTP
+
+- ```homePage``` handler, que obtém o nome de usuário da solicitação HTTP chamando o manipulador ```getUserName```. Em seguida, verificamos se não está vazio ou se há um valor de cookie presente. Se o nome de usuário não estiver em branco, analisamos ```home.html```, injetamos o nome de usuário como um mapa de dados, geramos a saída HTML e gravamos em um fluxo de resposta HTTP; caso contrário, redirecionamos para o URL raiz /
+
+- método ```main()```, onde iniciamos a execução do programa. Como esse método faz muitas coisas:
+
+    - ```var router = mux.NewRouter():```criamos uma nova instância do roteador
+
+    - ```router.HandleFunc("/", loginPage):```estamos registrando o manipulador ```loginPageHandler``` com o padrão / URL usando o HandleFunc do pacote ```gorilla / mux```, o que significa que o manipulador ```loginPage``` é executado passando ```(http.ResponseWriter, * http. Pedido)``` como parâmetros para ele sempre que acessar o URL HTTP com o padrão /
+
+    - ```router.HandleFunc("/home", homePage):```estamos registrando o manipulador ```homePageHandler``` com o padrão de URL / home usando o ```HandleFunc``` do pacote ```gorilla / mux```, o que significa que o manipulador ```homePage``` é executado passando (http.ResponseWriter, * http.Request) como parâmetros para ele sempre que acessar o URL HTTP com o padrão / home
+
+    - ```router.HandleFunc("/login", login).Methods("POST"):```estamos registrando o manipulador loginHandler com o padrão de URL / login usando o HandleFunc do pacote gorilla / mux, o que significa que o manipulador de login é executado passando (http.ResponseWriter, * http.Request) como parâmetros para ele sempre que acessar o URL HTTP com o padrão / login
+
+    - ```router.HandleFunc("/logout", logout).Methods("POST"):```estamos registrando o manipulador logoutHandler com o padrão de URL / logout usando o HandleFunc do pacote gorilla / mux, o que significa que o manipulador de logout é executado passando (http.ResponseWriter, * http.Request) como parâmetros para ele sempre que acessar o URL HTTP com o padrão / logout
+
+    - ```http.Handle("/", router):```estamos registrando o roteador para o padrão / URL usando HandleFunc do pacote net / http, o que significa que todas as solicitações com o padrão / URL são manipuladas pelo manipulador do roteador. 
+
+    - ```err := http.ListenAndServe(CONN_HOST+":"+CONN_PORT, nil):```estamos chamando http.ListenAndServe para atender a solicitações HTTP que tratam cada conexão de entrada em um Goroutine separado. O ListenAndServe aceita dois parâmetros - endereço do servidor e manipulador, em que o endereço do servidor é localhost: 8080 e o manipulador é nulo, o que significa que estamos solicitando ao servidor que use o DefaultServeMux como manipulador
+
+    - ```if err != nil { log.Fatal("error starting http server : ", err) return}:```verificamos se há algum problema com o início do servidor. Se houver, registre o erro e saia com um código de status 1
