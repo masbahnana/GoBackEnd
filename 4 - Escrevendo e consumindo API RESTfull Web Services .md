@@ -182,7 +182,7 @@ Sempre que temos que enviar dados para o servidor através de uma chamada assín
 - 2.Crie ```http-rest-post.go``` onde definiremos uma rota adicional que suporte o método HTTP ```POST``` e um manipulador que adiciona um funcionário à matriz estática inicial de funcionários e grava a lista atualizada em um fluxo de resposta HTTP
 
 ```
-~~~go
+~~~go~~~
 package main
 import 
 (
