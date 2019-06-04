@@ -96,9 +96,9 @@ Vamos escrever uma consulta SQL e executá-la usando o pacote ```database / sql`
 Como já estabelecemos uma conexão com o banco de dados MySQL em nossa receita anterior, vamos apenas estendê-lo para criar um registro executando uma consulta SQL.
 
 Antes de criar um registro, temos que criar uma tabela no banco de dados MySQL, o que faremos executando os comandos
-```
-[print](/home/nraythz/w```orkspace/GoBackEnd/print.pgn)
-```
+
+[print](/home/nraythz/workspace/GoBackEnd/print.pgn)
+
 
 - 1.Instale os pacotes ```github.com/go-sql-driver/mysql``` e ```github.com/gorilla/mux```, usando o comando ```go get```
 
