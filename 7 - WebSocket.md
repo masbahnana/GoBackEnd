@@ -5,11 +5,13 @@ Com o WebSocket, o cliente e o servidor podem falar independentemente, cada um c
 ## Criando um WebSocket Server
 - 1.Instale o pacote ```github.com/gorilla/websocket``` usando o comando ```go get```
 
-```$ go get github.com/gorilla/websocket``` 
+```bash
+$ go get github.com/gorilla/websocket
+```
 
 - 2.Crie ```websocket-server.go```, onde faremos upgrade de uma solicitação HTTP para WebSocket, leremos a mensagem JSON do cliente e a transmitiremos para todos os clientes conectados
 
-```
+```go
 package main 
 import 
 (
@@ -89,7 +91,9 @@ func broadcastMessagesToClients()
 
 - 3.Rode no terminal
 
-```$ go run websocket-server.go```
+```bash
+$ go run websocket-server.go
+```
 
 ### Como isso deve funcionar
 - Assim que executarmos o programa, o servidor WebSocket começará a escutar localmente na porta ```8080```
@@ -141,9 +145,7 @@ Aprendemos como depurar um servidor WebSocket que está sendo executado localmen
 
 - 3.Renomeie a configuração de depuração para o ```WebSocket Remote Debug```, altere o Host para ```IP``` ou ```DNS``` da máquina remota e clique em Aplicar e OK
 
-- 4.Execute um servidor Delve sem cabeçalho no computador de destino ou remoto executando o seguinte comando
-
-```https://www.jetbrains.com/go/```
+- 4.Execute um servidor Delve sem cabeçalho no computador de destino ou remoto executando o seguinte comando `https://www.jetbrains.com/go/`
 
 > O comando anterior iniciará um servidor de API escutando na porta 2345
 
@@ -161,14 +163,14 @@ Aprendemos como depurar um servidor WebSocket que está sendo executado localmen
 
 - 1.Instale os pacotes ```github.com/gorilla/websocket``` e ```github.com/stretchr/testify/assert``` usando o comando ```go get```
 
-```
+```bash
 $ go get github.com/gorilla/websocket
 $ go get github.com/stretchr/testify/assert
 ```
 
-- 2.Crie ```websocket-server_test.go``` onde criaremos um servidor de teste, conectaremos a ele usando o cliente Gorilla e, eventualmente, leremos e escreveremos mensagens para testar a conexão
+- 2.Crie ```websocket-server_test.go``` onde criaremos um servidor de teste, conectaremos a ele usando o cliente [Gorilla](https://www.gorillatoolkit.org/) e, eventualmente, leremos e escreveremos mensagens para testar a conexão
 
-```
+```go
 package main
 import 
 (
@@ -210,7 +212,7 @@ func TestWebSocketServer(t *testing.T)
 ### Como isso deve funcionar
 - Execute ```go test```
 
-```
+```bash
 $ go test websocket-server_test.go websocket-server.go
 ok  command-line-arguments 0.048s
 ```
@@ -219,15 +221,17 @@ ok  command-line-arguments 0.048s
 
 - Vamos ver como fica quando um teste Go falha. Altere a saída esperada na instrução assert para outra coisa. No seguinte ```Hello``` foi alterado para ```Hi```
 
-```
+```go
 ...
 assert.Equal(t, "hi", message.Message, "they should be equal")
 ...
-``` 
+```
 
 - Execute o ```go teste``` de novo
 
-```$ go test websocket-server_test.go websocket-server.go``` 
+```bash
+$ go test websocket-server_test.go websocket-server.go
+```
 
 - Ele nos fornecerá a resposta de falha junto com o rastreio de erro
 

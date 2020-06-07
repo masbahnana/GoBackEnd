@@ -8,11 +8,13 @@ Vamos criar um primeiro template.html com alguns espaços reservados cujo valor 
 
 - 1.Crie ```first-template.html``` dentro do diretório templates (crie esse diretório também), executando o comando:
 
-```$ mkdir templates && cd templates && touch first-template.html```
+```bash
+$ mkdir templates && cd templates && touch first-template.html
+```
 
 - 2.Copie o código no ```first-template.html```:
 
-```
+```html
 <html>
   <head>
     <meta charset="utf-8">
@@ -31,7 +33,7 @@ O modelo anterior tem dois espaços reservados, ```{{.Name}}``` e ```{{.Id}}```,
 
 - 3.Crie ```first-template.go```, onde preencheremos os valores dos espaços reservados, geraremos um HTML como saída e o escreveremos no cliente, da seguinte maneira:
 
-```
+```go
 import 
 (
   "fmt"
@@ -76,7 +78,9 @@ func main()
 
 - 4.Rode o programa conforme a abaixo:
 
-```$ go run first-template.go```
+```bash
+$ go run first-template.go
+```
 
 
 ### Como isso funciona
@@ -87,7 +91,9 @@ Navegando ```http://localhost:8080``` nos mostrará o ```Hello Foo!``` que está
 
 Execute ```curl -X GET http://localhost:8080``` na linha de comando:
 
-```$ curl -X GET http://localhost:8080```
+```bash
+$ curl -X GET http://localhost:8080
+```
 
 Isso resultará na seguinte resposta do servidor 
 

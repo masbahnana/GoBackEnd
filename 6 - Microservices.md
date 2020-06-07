@@ -4,14 +4,14 @@ Com o aumento da cultura DevOps, os microsserviços começaram a ganhar populari
 ## Primeiro protocolo buffer
 - 1.Verifique se o ```protocolo (protoc)``` está instalado
 
-```
+```bash
 $ protoc --version
  libprotoc 3.3.2
 ```
 
 - 2.Instale o ```protobuf```
 
-```
+```bash
 $ git clone https://github.com/google/protobuf
 $ cd protobuf
 $ ./autogen.sh
@@ -23,7 +23,7 @@ $ make install
 
 - 3.Crie ```hello.proto``` dentro do diretório ```proto``` e defina uma interface de``` service``` com o nome ```Say```, que possui dois tipos de dados - ```Request and Response```
 
-```
+```protobuf
 syntax = "proto3";
 service Say 
 {
@@ -42,7 +42,9 @@ message Response
 
 - 4.Compile hello.proto
 
-```$ protoc --go_out=plugins=micro:. hello.proto```
+```bash
+$ protoc --go_out=plugins=micro:. hello.proto
+```
 
 
 ### Como isso deve funcionar
@@ -63,7 +65,7 @@ Em uma arquitetura de microsserviços na qual vários serviços são implantados
 
 - 1.Verifique se o ```Consul``` está instalado
 
-```
+```bash
 $ consul version
  Consul v0.8.5
  Protocol 2 spoken by default, understands 2 to 3 (agent will automatically use protocol >2 when speaking to compatible agents)
@@ -71,14 +73,16 @@ $ consul version
 
 - 2.Inicie o agente ```consul``` em modo de servidor
 
-```$ consul agent -dev```
+```bash
+$ consul agent -dev
+```
 
 ### Como isso deve funcionar
 - Quando o comando for executado com êxito, o agente Consul começará a ser executado no modo de servidor
 
 - Também podemos listar os membros do cluster do Consul executando o comando
 
-```
+```bash
 $ consul members
 This will give us the following result:
 ```
@@ -93,11 +97,13 @@ Um microsserviço é apenas um pedaço de código que é executado como um proce
 
 - 1.Inicie o agente``` consul``` executando
 
-```$ consul agent -dev```
+```bash
+$ consul agent -dev
+```
 
 - 2.Instale e execute ```micro``` executando
 
-```
+```bash
 $ go get github.com/micro/micro
 $ micro api
  2018/02/06 00:03:36 Registering RPC Handler at /rpc
@@ -112,7 +118,7 @@ $ micro api
 
 - 4.Copie o seguinte conteúdo para ```first-greeting-service.go```
 
-```
+```bash
 package main
 import 
 (
@@ -149,7 +155,9 @@ func main()
 
 - 5.Vá para o diretório services e execute o programa
 
-```$ go run first-greeting-service.go```
+```bash
+$ go run first-greeting-service.go
+```
 
 
 ### Como isso deve funcionar
@@ -157,7 +165,7 @@ func main()
 
 - Execute uma solicitação POST na linha de comando da seguinte maneira
 
-```
+```bash
 $ curl -X POST -H 'Content-Type: application/json' -d '{"service": "go.micro.service.greeter", "method": "Say.Hello", "request": {"name": "Arpit Aggarwal"}}' http://localhost:8080/rpc
 ```
 > Isso nos dará Hello seguido do nome como uma resposta do servidor
@@ -181,11 +189,13 @@ Inicie o agente consul, micro API, first-greeting-service.go e second-greeting-s
 
 - 2.Crie greeting-api.go dentro do diretório api 
 
-```$ mkdir api && cd api && toque greeting-api.go```
+```bash
+$ mkdir api && cd api && toque greeting-api.go
+```
 
 - 3.Copie o código para greeting-api.go
 
-```
+```go
 package main
 import 
 (
@@ -255,7 +265,9 @@ func main()
 
 - 4.Mova para o diretório ```api``` e execute o programa
 
-```$ go run greeting-api.go```
+```bash
+$ go run greeting-api.go
+```
 
 
 ### Como isso deve funcionar
@@ -271,11 +283,15 @@ Até agora, usamos a linha de comando para executar solicitações GET e POST HT
 
 - 1.Instale o pacote ```go get github.com/micro/micro``` usando o comando ```go get```
 
-```$ go get github.com/micro/micro```
+```bash
+$ go get github.com/micro/micro
+```
 
 - 2.Execute a UI da web
 
-```$ micro web```
+```bash
+$ micro web
+```
 
 
 ### Como isso deve funcionar
@@ -284,4 +300,3 @@ Até agora, usamos a linha de comando para executar solicitações GET e POST HT
 - Consultando nosso serviço de greeter usando a interface do usuário da web com o pedido ```{"name": "Arpit Aggarwal"}``` renderizará a resposta, ```{"msg": "Hello Arpit Aggarwal"}```
 
 - Consultando o mesmo serviço greeter usando um comando da CLI, consulte ```go.micro.service.greeter Say.Hello {"name": "Arpit Aggarwal"}``` renderizará a resposta, ```{"msg": "Hello Arpit Aggarwal"}```
-
