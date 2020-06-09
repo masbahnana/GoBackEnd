@@ -15,11 +15,13 @@ Vamos implementar uma sessão usando cookies HTTP.
 
 - 1.Instale o pacote ```github.com/gorilla/sessions``` usando o comando go get
 
-```$ go get github.com/gorilla/sessions```
+```bash
+$ go get github.com/gorilla/sessions
+```
 
 - 2.Crie ```http-session.go``` onde criaremos um armazenamento de cookies do Gorilla para salvar e recuperar informações da sessão definindo três manipuladores - ```/login, /home ```e ```/logout``` - onde criaremos um cookie de sessão válido, escrevendo uma resposta para um HTTP fluxo de resposta e invalidando um cookie de sessão, respectivamente.
 
-```
+```go
 package main
 import 
 (
@@ -90,7 +92,9 @@ func main()
 
 - 3.Rode no terminal
 
-```$ go run http-session.go```
+```bash
+$ go run http-session.go
+```
 
 ### Como isso deve funcionar
 Assim que executarmos o programa, o servidor HTTP começará a escutar localmente na porta ```8080```.
@@ -99,15 +103,21 @@ Assim que executarmos o programa, o servidor HTTP começará a escutar localment
 
 - Primeiro, vamos acessar ```/home``` executando o seguinte comando:
 
-```$ curl -X GET http://localhost:8080/home```
+```bash
+$ curl -X GET http://localhost:8080/home
+```
 
 - Isso ocorre porque primeiro precisamos fazer login em um aplicativo, o que criará um ID de sessão que o servidor validará antes de fornecer acesso a qualquer página da web. Então, vamos entrar no aplicativo:
 
-```$ curl -X GET -i http://localhost:8080/login```
+```bash
+$ curl -X GET -i http://localhost:8080/login
+```
 
 - Em seguida, usaremos esse cookie fornecido para acessar ```/home```, da seguinte maneira:
 
-```$ curl --cookie "session-name=MTUyMzEwMTI3NXxEdi1CQkFFQ180SUFBUkFCRUFBQUpmLUNBQUVHYzNSeWFXNW5EQThBRFdGMWRHaGxiblJwWTJGMFpXUUVZbTl2YkFJQ0FBRT18ou7Zxn3qSbqHHiajubn23Eiv8a348AhPl8RN3uTRM4M=;" http://localhost:8080/home```
+```bash
+$ curl --cookie "session-name=MTUyMzEwMTI3NXxEdi1CQkFFQ180SUFBUkFCRUFBQUpmLUNBQUVHYzNSeWFXNW5EQThBRFdGMWRHaGxiblJwWTJGMFpXUUVZbTl2YkFJQ0FBRT18ou7Zxn3qSbqHHiajubn23Eiv8a348AhPl8RN3uTRM4M=;" http://localhost:8080/home
+```
 
 **Entendendo as partes**
 - Usando ```var store * sessions.CookieStore```, declaramos uma loja particular de cookies para armazenar sessões usando cookies seguros.
@@ -137,14 +147,14 @@ Você tem o Redis e o Redis Browser instalados e sendo executados localmente nas
 
 - 1.Instale ```gopkg.in/boj/redistore.v1``` e ```github.com/gorilla/sessions``` usando o comando ```go get```
 
-```
+```bash
 $ go get gopkg.in/boj/redistore.v1
 $ go get github.com/gorilla/sessions
 ```
 
 - 2.Crie ```http-session-redis.go```, onde criaremos um ```RedisStore``` para armazenar e recuperar variáveis de sessão:
 
-```
+```go
 package main
 import 
 (
@@ -226,7 +236,9 @@ func main()
 
 - 3.Rode no terminal
 
-```$ go run http-session-redis.go```
+```bash
+$ go run http-session-redis.go
+```
 
 
 ### Como isso deve funcionar
@@ -236,13 +248,17 @@ Assim que executarmos o programa, o servidor HTTP começará a escutar localment
 
 - Primeiro, vamos acessar ```/home``` executando o seguinte comando:
 
-```$ curl -X GET http://localhost:8080/home```
+```bash
+$ curl -X GET http://localhost:8080/home
+```
 
 - Isso resultará em uma mensagem de acesso não autorizada do servidor
 
 - Isso ocorre porque primeiro precisamos fazer login em um aplicativo, que criará um ID de sessão que o servidor validará antes de fornecer acesso a qualquer página da web. Então, vamos entrar no aplicativo:
 
-```$ curl -X GET -i http://localhost:8080/login```
+```bash
+$ curl -X GET -i http://localhost:8080/login
+```
 
 - O comando anterior nos dará o Cookie, que deve ser configurado como um cabeçalho de solicitação para acessar qualquer página da web 
 
@@ -250,7 +266,9 @@ Assim que executarmos o programa, o servidor HTTP começará a escutar localment
 
 - Usaremos o cookie fornecido para acessar / home, da seguinte maneira
 
-```$ curl --cookie "session-name=MTUyMzEwNDUyM3xOd3dBTkV4T1JrdzNURFkyUkVWWlQxWklUekpKVUVOWE1saFRUMHBHVTB4T1RGVXlSRU5RVkZWWk5VeFNWVmRPVVZSQk4wTk1RMUU9fAlGgLGU-OHxoP78xzEHMoiuY0Q4rrbsXfajSS6HiJAm;" http://localhost:8080/home```
+```bash
+$ curl --cookie "session-name=MTUyMzEwNDUyM3xOd3dBTkV4T1JrdzNURFkyUkVWWlQxWklUekpKVUVOWE1saFRUMHBHVTB4T1RGVXlSRU5RVkZWWk5VeFNWVmRPVVZSQk4wTk1RMUU9fAlGgLGU-OHxoP78xzEHMoiuY0Q4rrbsXfajSS6HiJAm;" http://localhost:8080/home
+```
 
 - Isso resultará na home page como uma resposta do servidor
 
@@ -268,11 +286,13 @@ Cookies são arquivos de texto simples que os navegadores da Web criam quando vo
 
 - 1.Instale o pacote ```github.com/gorilla/securecookie``` usando o comando ```go get```
 
-```$ go get github.com/gorilla/securecookie```
+```bash
+$ go get github.com/gorilla/securecookie
+```
 
 - 2.Crie http-cookie.go, onde criaremos um cookie seguro do Gorilla para armazenar e recuperar cookies assim:
 
-```
+```go
 package main
 import 
 (
@@ -348,7 +368,9 @@ func main()
 
 - 3.Rode no terminal
 
-```$ go run http-cookie.go```
+```bash
+$ go run http-cookie.go
+```
 
 
 ### Como isso deve funcionar
@@ -380,11 +402,13 @@ Existem vários pacotes, como ```https://github.com/coocood/freecache``` e ```ht
 
 - 1.Instale o pacote ```github.com/patrickmn/go-cache``` usando o comando ```go get```
 
-```$ go get github.com/patrickmn/go-cache```
+```bash
+$ go get github.com/patrickmn/go-cache
+```
 
 - 2.Crie ```http-caching.go```, onde criaremos um cache e o preencheremos com dados de inicialização do servidor
 
-```
+```go
 package main
 import 
 (
@@ -434,7 +458,9 @@ func main()
 
 - 3.Rode no terminal
 
-```$ go run http-caching.go```
+```bash
+$ go run http-caching.go
+```
 
 
 ### Como isso deve funcionar
@@ -461,11 +487,13 @@ Em Go, pode ser implementado de várias maneiras. Uma maneira é escrever manipu
 
 - 1.Instale o pacote ```github.com/gorilla/mux``` usando o comando ```go get```
 
-```$ go get github.com/gorilla/mux```
+```bash
+$ go get github.com/gorilla/mux
+```
 
 - 2.Crie ```http-error-handling.go```, onde criaremos um manipulador personalizado que atua como um ```wrapper``` para lidar com todas as solicitações HTTP
 
-```
+```go
 package main
 import 
 (
@@ -540,7 +568,9 @@ func main()
 
 - 3.Rode no terminal
 
-```$ go run http-error-handling.go```
+```bash
+$ go run http-error-handling.go
+```
 
 
 ### Como isso deve funcionar
@@ -553,7 +583,7 @@ func main()
 **Entendendo as partes**
 - Definimos uma estrutura ```NameNotFoundError``` com dois campos - Código do tipo int e erro do tipo error, que representa um erro com um código de status HTTP associado
 
-```
+```go
 type NameNotFoundError struct 
 {
   Code int
@@ -562,7 +592,7 @@ type NameNotFoundError struct
 ```
 - Permitimos que ```NameNotFoundError``` satisfizesse a interface de erro
 
-```
+```go
 func (nameNotFoundError NameNotFoundError) Error() string 
 {
   return nameNotFoundError.Err.Error()
@@ -573,7 +603,7 @@ func (nameNotFoundError NameNotFoundError) Error() string
 
 - Em seguida, definimos um manipulador ```ServeHTTP```, que chama um manipulador que passamos para ```WrapperHandler passing (http.ResponseWriter, * http.Request)``` como parâmetros para ele e verifica se há algum erro retornado pelo manipulador. Se houver, então os manipulará apropriadamente usando o caso de troca
 
-```
+```go
 if err != nil 
 {
   switch e := err.(type) 
@@ -600,18 +630,20 @@ Como já criamos um formulário HTML em uma de nossas receitas anteriores, vamos
 
 - 1.Instale ```github.com/gorilla/mux``` e ```github.com/gorilla/securecookie``` usando o comando ```go get```
 
-```
+```bash
 $ go get github.com/gorilla/mux
 $ go get github.com/gorilla/securecookie
 ```
 
 - 2.Crie ```home.html``` dentro do diretório de templates
 
-```$ mkdir templates && cd templates && touch home.html```
+```bash
+$ mkdir templates && cd templates && touch home.html
+```
 
 - 3.Copie o conteúdo para ```home.html```
 
-```
+```html
 <html>
   <head>
     <title></title>
@@ -629,7 +661,7 @@ $ go get github.com/gorilla/securecookie
 
 - 4.Crie ```html-form-login-logout.go```, onde analisaremos o formulário de login, leremos o campo de nome de usuário e definiremos um cookie de sessão quando um usuário clicar no botão Login. Também limpamos a sessão quando um usuário clica no botão Logout
 
-```
+```go
 package main
 import 
 (
@@ -752,7 +784,9 @@ func main()
 
 - 5.Rode no terminal
 
-```$ go run html-form-login-logout.go```
+```bash
+$ go run html-form-login-logout.go
+```
 
 
 ### Como isso deve funcionar

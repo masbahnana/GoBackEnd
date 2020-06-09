@@ -6,11 +6,13 @@ Ao escrever aplicativos da web, geralmente temos que expor nossos serviços ao c
 
 - 1.Instale o pacote ```github.com/gorilla/mux``` com o ```go get```
 
-```$ go get github.com/gorilla/mux```
+```bash
+$ go get github.com/gorilla/mux
+```
 
 - 2.Crie ```http-rest-get.go``` onde definiremos duas rotas - ```/employees``` e ```/employee/{id}``` junto com seus manipuladores. O primeiro grava o array estático de funcionários e o segundo grava detalhes do funcionário para o ID fornecido para um fluxo de resposta HTTP
 
-```
+```go
 package main
 import 
 (
@@ -107,11 +109,13 @@ func main()
     return
   }
 }
-``` 
+```
 
 - 3.Rode no terminal
 
-```$ go run http-rest-get.go``` 
+```bash
+$ go run http-rest-get.go
+```
 
 
 ### Como isso deve funcionar
@@ -119,12 +123,25 @@ func main()
 
 - Em seguida, executar uma solicitação **GET** a partir da linha de comando da seguinte maneira fornecerá uma lista de todos os funcionários
 
-```$ curl -X GET http://localhost:8080/employees[{"id":"1","firstName":"Foo","lastName":"Bar"},{"id":"2","firstName":"Baz","lastName":"Qux"}]```
+```bash
+$ curl -X GET http://localhost:8080/employees
+```
+```json
+[
+	{"id":"1","firstName":"Foo","lastName":"Bar"},
+    {"id":"2","firstName":"Baz","lastName":"Qux"}
+]
+```
 
 
 - Executar uma solicitação GET para um ID de funcionário específico da linha de comando da seguinte maneira, fornecerá os detalhes do funcionário para o ID correspondente
 
-```$ curl -X GET http://localhost:8080/employee/1 {"id":"1","firstName":"Foo","lastName":"Bar"}```
+```bash
+$ curl -X GET http://localhost:8080/employee/1
+```
+```json
+{"id":"1","firstName":"Foo","lastName":"Bar"}
+```
 
 **Entendo as partes**
 - Usamos ```import ("enconding/json" "log" "net/http" "strconv" "github.com/gorilla/mux")```. Aqui, nós importamos o ```github.com/gorilla/mux``` para criar um Gorilla Mux Router
@@ -133,7 +150,7 @@ func main()
 
 - Em seguida, definimos duas rotas para a solicitação GET
 
-```
+```go
 var routes = Routes
 {
   Route
@@ -154,7 +171,7 @@ var routes = Routes
 ```
 - Definimos um array de empregados estáticos
 
-```
+```go
 func init() 
 {
   employees = Employees 
@@ -181,7 +198,7 @@ Sempre que temos que enviar dados para o servidor através de uma chamada assín
 
 - 2.Crie ```http-rest-post.go``` onde definiremos uma rota adicional que suporte o método HTTP ```POST``` e um manipulador que adiciona um funcionário à matriz estática inicial de funcionários e grava a lista atualizada em um fluxo de resposta HTTP
 
-```
+```go
 package main
 import 
 (
@@ -291,7 +308,9 @@ func main()
 
 - A execução de uma solicitação ``` POST```  a partir da linha de comando da seguinte maneira adicionará um funcionário à lista com ``` ID como 3```  e retornará a lista de funcionários como uma resposta
 
-```$ curl -H "Content-Type: application/json" -X POST -d '{"Id":"3", "firstName":"Quux", "lastName":"Corge"}' http://localhost:8080/employee/add``` 
+```bash
+$ curl -H "Content-Type: application/json" -X POST -d '{"Id":"3", "firstName":"Quux", "lastName":"Corge"}' http://localhost:8080/employee/add
+```
 
 **Entendendo as partes**
 - Adicionamos outra rota com o nome addEmployee que executa o manipulador addEmployee para cada solicitação POST para o padrão de URL ```/employee/add``` 
@@ -304,11 +323,13 @@ Sempre que quisermos atualizar um registro que tenhamos criado anteriormente ou 
 
 - 1.Instale o pacote ```github.com/gorilla/mux``` com o ```go get```
 
-```$ go get github.com/gorilla/mux```
+```bash
+$ go get github.com/gorilla/mux
+```
 
 - 2.Crie ```http-rest-put.go``` onde definiremos uma rota adicional que suporte o método HTTP ```PUT``` e um manipulador que atualize os detalhes do funcionário para a ID fornecida ou adicione um funcionário à matriz estática inicial de funcionários; se o ID não existir, empacote-o no JSON e grave-o em um fluxo de resposta HTTP
 
-```
+```go
 package main
 import 
 (
@@ -452,7 +473,9 @@ func main()
 
 - 3.Rode no terminal
 
-```$ go run http-rest-put.go``` 
+```bash
+$ go run http-rest-put.go
+```
 
 
 ### Como isso deve funcionar
@@ -460,13 +483,18 @@ func main()
 
 - Executar uma solicitação ```PUT``` a partir da linha de comando da seguinte maneira, atualizará o ```firstName``` e o ```lastName``` para um funcionário com ID 1
 
-```$ curl -H "Content-Type: application/json" -X PUT -d '{"Id":"1", "firstName":"Grault", "lastName":"Garply"}' http://localhost:8080/employee/update```
+```bash
+$ curl -H "Content-Type: application/json" -X PUT -d '{"Id":"1", "firstName":"Grault", "lastName":"Garply"}' http://localhost:8080/employee/update
+```
 
 - Execute uma solicitação ```PUT``` para um funcionário com ID 3 na linha de comando da seguinte maneira, ele adicionará outro funcionário à matriz, pois não há nenhum funcionário com ID 3, demonstrando o cenário upsert
 
-```$ curl -H "Content-Type: application/json" -X PUT -d '{"Id":"3", "firstName":"Quux", "lastName":"Corge"}' http://localhost:8080/employee/update```
+```bash
+$ curl -H "Content-Type: application/json" -X PUT -d '{"Id":"3", "firstName":"Quux", "lastName":"Corge"}' http://localhost:8080/employee/update
+```
 
 **Entendendo as partes**
+
 - Primeiro, adicionamos outra rota com o nome ```updateEmployee```, que executa o manipulador ```updateEmployee``` para cada solicitação PUT para o padrão de URL ```/employee/update```
 
 - ```updateEmployee```, que basicamente decodifica os dados do funcionário que fazem parte de uma solicitação ```PUT``` usando o manipulador ```NewDecoder``` do pacote ```encoding / json``` interno de Go, repete a matriz employees para saber se o ID do funcionário solicitado existe na matriz estática inicial de funcionários, que também podemos chamar de cenário UPDATE ou UPSERT, executa a ação necessária e grava a resposta em um fluxo de resposta HTTP
@@ -477,11 +505,13 @@ Sempre que queremos remover um registro que não é mais necessário, então vam
 
 - 1.Instale o pacote ```github.com/gorilla/mux``` com o ```go get```
 
-```$ go get github.com/gorilla/mux```
+```bash
+$ go get github.com/gorilla/mux
+```
 
 - 2.Crie ```http-rest-delete.go``` onde definiremos uma rota que suporte o método HTTP ```DELETE``` e um manipulador que exclua os detalhes do funcionário para a ID fornecida da matriz estática de funcionários, empacote a matriz para JSON e grave-a em um Fluxo de resposta HTTP
 
-```
+```go
 package main
 import 
 (
@@ -619,16 +649,21 @@ func main()
 
 - 3.Rode no terminal
 
-```$ go run http-rest-delete.go``` 
+```bash
+$ go run http-rest-delete.go
+```
 
 ### Como isso deve funcionar
 - Assim que executarmos o programa, o servidor HTTP começará a escutar localmente na porta 8080
 
 - A execução de uma solicitação DELETE da linha de comando da seguinte maneira excluirá um funcionário com ID 1 e nos fornecerá a lista atualizada de funcionários
 
-```$ curl -H "Content-Type: application/json" -X DELETE -d '{"Id":"1", "firstName": "Foo", "lastName": "Bar"}' http://localhost:8080/employee/delete```
+```bash
+$ curl -H "Content-Type: application/json" -X DELETE -d '{"Id":"1", "firstName": "Foo", "lastName": "Bar"}' http://localhost:8080/employee/delete
+```
 
 **Ententendo as partes**
+
 - Adicionamos outra rota com o nome ```deleteEmployee```, que executa o manipulador ```deleteEmployee``` para cada solicitação ```DELETE``` para o padrão de URL ```/employee/delete```
 
 - ```deleteEmployee```, que basicamente decodifica os dados do funcionário que fazem parte de uma solicitação ```DELETE``` usando o manipulador ```NewDecoder``` do pacote ```encoding / json``` interno de Go, obtém o índice do empregado solicitado usando a função auxiliar ```GetIndex``` , exclui o funcionário e grava o array atualizado como JSON em um fluxo de resposta HTTP
@@ -641,11 +676,13 @@ No entanto, em um caso em que você tem uma API pública ou uma API em que você
 
 - 1.Instale o pacote ```github.com/gorilla/mux``` com o ```go get```
 
-```$ go get github.com/gorilla/mux```
+```bash
+$ go get github.com/gorilla/mux
+```
 
 - 2.Crie ```http-rest-versioning.go``` onde definiremos duas versões do mesmo caminho de URL que suportam o método HTTP GET, com um tendo v1 como prefixo e o outro com v2 como prefixo na rota
 
-```
+```go
 package main
 import 
 (
@@ -759,15 +796,38 @@ func main()
 
 - Executar uma solicitação ```GET``` com o prefixo do caminho como / v1 a partir da linha de comando da seguinte maneira, fornecerá uma lista de um conjunto de funcionários
 
-```$ curl -X GET http://localhost:8080/v1/employees [{"id":"1","firstName":"Foo","lastName":"Bar"},{"id":"2","firstName":"Baz","lastName":"Qux"}] ```
+```bash
+$ curl -X GET http://localhost:8080/v1/employees
+```
+```json
+[
+    {"id":"1","firstName":"Foo","lastName":"Bar"},
+    {"id":"2","firstName":"Baz","lastName":"Qux"}
+]
+```
 
 - Executar uma solicitação GET com prefixo de caminho como / v2 fornecerá uma lista de outro conjunto de funcionários
 
-```$ curl -X GET http://localhost:8080/v2/employees [{"id":"1","firstName":"Baz","lastName":"Qux"},{"id":"2","firstName":"Quux","lastName":"Quuz"}]```
+```bash
+$ curl -X GET http://localhost:8080/v2/employees
+```
+```json
+[
+    {"id":"1","firstName":"Baz","lastName":"Qux"},
+    {"id":"2","firstName":"Quux","lastName":"Quuz"}
+]
+```
 
 - Ao projetar a URL REST, preferimos retornar os dados padrão se o cliente consultar o terminal sem especificar a versão no caminho da URL. Para incorporá-lo, modificamos o manipulador getEmployees para verificar o prefixo na URL e agir de acordo. Assim, executar uma solicitação GET sem o prefixo de caminho da linha de comando, como a seguir, fornecerá uma lista com um único registro, que podemos chamar de resposta padrão ou inicial do ponto de extremidade REST chamado
 
-```$ curl -X GET http://localhost:8080/employees  [{"id":"1","firstName":"Foo","lastName":"Bar"}]```
+```bash
+$ curl -X GET http://localhost:8080/employees
+```
+```json
+[
+	{"id":"1","firstName":"Foo","lastName":"Bar"}
+]
+```
 
 **Entendendo as partes**
 - Primeiro, definimos uma única rota com o nome ```getEmployees```, que executa um manipulador ```getEmployees``` para cada solicitação ```GET``` para o padrão de URL ```/employees```
@@ -786,26 +846,35 @@ Hoje, a maioria dos aplicativos que se comunicam com servidores usam serviços R
 
 - 1.Execute ```http-rest-get.go```, que criamos em uma das nossas receitas anteriores, em um terminal separado, executando o seguinte comando
 
-```$ go run http-rest-get.go```
+```bash
+$ go run http-rest-get.go
+```
 
 - 2.Execute http-rest-get.go, que criamos anteriormente
 
 - 3.Em um terminal separado, executando o seguinte comando
 
-```$ curl -X GET http://localhost:8080/employees```
+```bash
+$ curl -X GET http://localhost:8080/employees
+```
 
 - 4.Isso deve retornar a seguinte resposta
 
-```[{"id":"1","firstName":"Foo","lastName":"Bar"},{"id":"2","firstName":"Baz","lastName":"Qux"}]```
+```json
+[
+    {"id":"1","firstName":"Foo","lastName":"Bar"},
+ 	{"id":"2","firstName":"Baz","lastName":"Qux"}
+]
+```
 - 5.Instale os pacotes ```github.com/gorilla/mux``` e ```gopkg.in/resty.v1``` usando o comando ```go get```
 
-```
+```bash
 $ go get github.com/gorilla/mux
 $ go get -u gopkg.in/resty.v1
 ```
 - 6.Crie ```http-rest-client.go``` onde definiremos manipuladores que chamam manipuladores resty, como ```GET, POST, PUT e DELETE```, obtêm a resposta do serviço REST e gravam em um fluxo de resposta HTTP
 
-```
+```go
 package main
 import 
 (
@@ -939,7 +1008,9 @@ func main()
 
 - 7.Rode no terminal
 
-```$ go run http-rest-client.go```
+```bash
+$ go run http-rest-client.go
+```
 
 
 ### Como isso deve funcionar
@@ -947,18 +1018,34 @@ func main()
 
 - A execução de uma solicitação GET para o cliente REST na linha de comando da seguinte maneira fornecerá uma lista de todos os funcionários do serviço
 
-```$ curl -X GET http://localhost:8090/employees```
-
-```[{"id":"1","firstName":"Foo","lastName":"Bar"},{"id":"2","firstName":"Baz","lastName":"Qux"}] ```
+```bash
+$ curl -X GET http://localhost:8090/employees
+```
+```json
+[
+	{"id":"1","firstName":"Foo","lastName":"Bar"},
+	{"id":"2","firstName":"Baz","lastName":"Qux"}
+]
+```
 
 - Execute http-rest-post.go, que criamos em uma de nossas receitas anteriores, em um terminal separado executando o seguinte comando
 
-```$ go run http-rest-post.go```
+```bash
+$ go run http-rest-post.go
+```
 
 - Executar uma solicitação POST para o cliente REST na linha de comando
 
-```$ curl -H "Content-Type: application/json" -X POST -d '{"Id":"3", "firstName":"Quux", "lastName":"Corge"}' http://localhost:8090/employee/add```
-```[{"id":"1","firstName":"Foo","lastName":"Bar"},{"id":"2","firstName":"Baz","lastName":"Qux"},{"id":"3","firstName":"Quux","lastName":"Corge"}]```
+```bash
+$ curl -H "Content-Type: application/json" -X POST -d '{"Id":"3", "firstName":"Quux", "lastName":"Corge"}' http://localhost:8090/employee/add
+```
+```json
+[
+	{"id":"1","firstName":"Foo","lastName":"Bar"},
+	{"id":"2","firstName":"Baz","lastName":"Qux"},
+	{"id":"3","firstName":"Quux","lastName":"Corge"}
+]
+```
 
 - Isso adicionará um funcionário à lista estática inicial e retornará uma lista atualizada dos funcionários
 

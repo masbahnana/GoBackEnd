@@ -8,9 +8,9 @@ Começaremos com algumas receitas simples para criar um servidor HTTP e TCP e pa
 ## Criando um simples HTTP server
 vamos criar um servidor HTTP simples que renderize o Hello World! quando navegamos ```http: // localhost: 8080``` ou executamos o curl ```http: // localhost: 8080``` a partir da linha de comando. Siga os passos:
 
-- 1.Na pasta que você criou para a aula crie um arquivo chamado ```http-server.go``` e faça como está abaixo:
+- 1.Na pasta que você criou para a aula crie um arquivo chamado ``http-server.go`` e faça como está abaixo:
 
-```
+```go
 package main
 import 
 (
@@ -43,7 +43,9 @@ func main()
 
 - 2.No terminal vá até a pasta onde está o seu código e faça como abaixo:
 
-```$ go run http-server.go```
+```bash
+$ go run http-server.go
+```
 
 
 ### Como isso deve funcionar:
@@ -74,7 +76,7 @@ Como já criamos um servidor HTTP em nosso passo a passo anterior, vamos apenas 
 - 1.Vamos atualizar o servidor HTTP que criamos no passo anterior, adicionando uma função BasicAuth e modificando o HandleFunc para chamá-lo.
 Na pasta que você criou para a aula crie um arquivo chamado ```http-server-basic-authentication.go``` e faça como está abaixo:
 
-```
+```go
 package main
 import 
 (
@@ -126,7 +128,9 @@ func main()
 
 - 2.No terminal vá até a pasta onde está o seu código e faça como abaixo:
 
-```$ go run http-server-basic-authentication.go``` 
+```bash
+$ go run http-server-basic-authentication.go
+```
 
 ### Como isso deve funcionar:
 Assim que executarmos o programa, o servidor HTTP começará a escutar localmente na porta ```8080```.
@@ -135,14 +139,14 @@ Quando o servidor for iniciado, o acesso a ```http: // localhost: 8080``` em um 
 
 Para acessar o servidor a partir da linha de comando, temos que fornecer o sinalizador ```--user``` como parte do comando curl, da seguinte maneira:
 
-```
+```bash
 $ curl --user admin:admin http://localhost:8080/
 Hello World!
 ```
 
 Também podemos acessar o servidor usando um token codificado base64 do nome de ```usuário: senha``` ou ```username: password```, que podemos obter de qualquer site, como ```https://www.base64encode.org/```, e passá-lo como um cabeçalho de autorização no comando curl, como:
 
-```
+```bash
 $ curl -i -H 'Authorization:Basic YWRtaW46YWRtaW4=' http://localhost:8080/
 
 HTTP/1.1 200 OK
@@ -159,7 +163,7 @@ Hello World!
 
 - Em seguida, declaramos um método ```BasicAuth ()```, que aceita dois parâmetros de entrada - um manipulador, que é executado após a autenticação bem-sucedida do usuário, e o realm, que retorna o ```HandlerFunc```, da seguinte maneira:
 
-```
+```go
 func BasicAuth(handler http.HandlerFunc, realm string) http.HandlerFunc 
 {
   return func(w http.ResponseWriter, r *http.Request)
@@ -184,7 +188,7 @@ No anterior anterior, obtemos primeiro o nome de usuário e a senha fornecidos n
 
 Finalmente, introduzimos uma mudança no método ```main ()``` para chamar ```BasicAuth``` do ```HandleFunc```, da seguinte maneira:
 
-```
+```go
 http.HandleFunc("/", BasicAuth(helloWorld, "Please enter your username and password"))
 ```
 
@@ -199,13 +203,13 @@ Vamos criar um servidor HTTP com um único manipulador, que irá escrever Hello 
 
 - 1.Para usar os manipuladores do Gorilla, primeiro precisamos instalar o pacote usando o comando ```go get``` ou copiá-lo manualmente para ```$ GOPATH / src ou $ GOPATH```, da seguinte forma:
 
-```
+```bash
 $ go get github.com/gorilla/handlers
 ```
 
 - 2.Crie ```http-server-mux.go``` e siga o código abaixo: 
 
-```
+```go
 package main
 import 
 (
@@ -253,7 +257,7 @@ Nesse passo, vamos criar um servidor TCP simples que aceitará uma conexão em `
 
 - 1.Crie ```tcp-server.go``` e copie o seguinte código:
 
-```
+```go
 package main
 import 
 (
@@ -289,7 +293,9 @@ func main()
 
 - 2.Depois rode o seguinte comando no terminal:
 
-```$ go run tcp-server.go```
+```bash
+$ go run tcp-server.go
+```
 
 
 ### Como isso deve funcionar:
@@ -324,7 +330,7 @@ Vamos atualizar o método main () para chamar um método handleRequest passando 
 
 - 1.Crie ```tcp-server-read-data.go``` e copie o seguinte código:
 
-```
+```go
 package main
 import 
 (
@@ -372,17 +378,21 @@ func handleRequest(conn net.Conn)
 
 - 2.Rode o seguinte comando no terminal
 
-```$ go run tcp-server-read-data.go```
+```bash
+$ go run tcp-server-read-data.go
+```
 
 
 ### Como isso deve funcionar:
 Assim que executarmos o programa, o servidor TCP começará a escutar localmente na porta 8080. A execução de um comando echo a partir da linha de comando da seguinte maneira enviará uma mensagem ao servidor TCP:
 
-```$ echo -n "Hello to TCP server\n" | nc localhost 8080```
+```bash
+$ echo -n "Hello to TCP server\n" | nc localhost 8080
+```
 
 - 1.Primeiro, chamamos ```handleRequest``` do método ```main ()``` usando a palavra-chave ```go```, o que significa que estamos invocando uma função em um Goroutine:
 
-```
+```go
 func main() 
 {
   ...
@@ -393,7 +403,7 @@ func main()
 
 - 2.Em seguida, definimos a função ```handleRequest```, que lê uma conexão de entrada no buffer até a primeira ocorrência de \ n e imprime a mensagem no console. Se houver algum erro na leitura da mensagem, a mensagem de erro será impressa junto com o objeto de erro e, finalmente, fechará a conexão, da seguinte forma:
 
-```
+```go
 func handleRequest(conn net.Conn) 
 {
   message, err := bufio.NewReader(conn).ReadString('\n')
@@ -416,7 +426,7 @@ Vamos atualizar o método handleRequest no programa para gravar dados no cliente
 
 - 1.Crie ```tcp-server-write-data.go``` e copie o seguinte conteúdo:
 
-```
+```go
 package main
 import 
 (
@@ -465,13 +475,17 @@ func handleRequest(conn net.Conn)
 
 - 2.No terminal use o comando:
 
-```$ go run tcp-server-write-data.go```
+```bash
+$ go run tcp-server-write-data.go
+```
 
 
 #### Como isso deve funcionar:
 Assim que executarmos o programa, o servidor TCP iniciará a escuta local na porta 8080. Execute um comando echo na linha de comando, da seguinte maneira:
 
-```$ echo -n "Hello to TCP server\n" | nc localhost 8080```
+```bash
+$ echo -n "Hello to TCP server\n" | nc localhost 8080
+```
 
 Isso nos dará a seguinte resposta do servidor:
 
@@ -479,7 +493,7 @@ Isso nos dará a seguinte resposta do servidor:
 
 Vejamos as mudanças que introduzimos nesse passo para gravar dados no cliente. Tudo em ```handleRequest``` é exatamente o mesmo que na receita anterior, exceto que introduzimos uma nova linha que grava dados como uma matriz de bytes na conexão, da seguinte maneira:
 
-```
+```go
 func handleRequest (conn net.Conn)
 {
    ...
@@ -496,7 +510,7 @@ Definiremos três rotas, como ```/```, /```login``` e /```logout```, juntamente 
 
 - 1.Crie http-server-basic-routing.go e copie o seguinte código:
 
-```
+```go
 package main
 import 
 (
@@ -537,23 +551,29 @@ func main()
 
 - 2.No terminal digite o seguinte comando:
 
-```$ go run http-server-basic-routing.go```
+```bash
+$ go run http-server-basic-routing.go
+```
 
 
 #### Como isso deve funcionar:
 Uma vez executado o programa, o servidor HTTP iniciará escutando localmente na porta ```8080``` e acessando ```http://localhost:8080/```, ```http://localhost:8080/login``` e ```http://localhost:8080/logout``` a partir de um navegador ou a linha de comando processará a mensagem definida na definição de manipulador correspondente. Por exemplo, execute ```http://localhost:8080/``` na linha de comando, da seguinte maneira:
 
-```$ curl -X GET -i http://localhost:8080/```
+```bash
+$ curl -X GET -i http://localhost:8080/
+```
 
 Poderíamos também executar ```http://localhost:8080/login``` a partir da linha de comando da seguinte maneira:
 
-```$ curl -X GET -i http://localhost:8080/login```
+```bash
+$ curl -X GET -i http://localhost:8080/login
+```
 
 **Entendendo o que escrevemos:**
 
 - 1.Começamos com a definição de três manipuladores ou recursos da web, como os seguintes:
 
-```
+```go
 func helloWorld(w http.ResponseWriter, r *http.Request) 
 {
   fmt.Fprintf(w, "Hello World!")
@@ -572,7 +592,7 @@ Aqui, o ```handler helloWorld``` escreve ```Hello World!``` em um fluxo de respo
 
 - 2.Em seguida, registramos três caminhos de URL (URL Paths) - ```/```, ```/login``` e ```/logout``` com ```DefaultServeMux``` usando ```http.HandleFunc ()```. Se um padrão de URL de solicitação de entrada corresponder a um dos caminhos registrados, o manipulador correspondente será chamado de passagem ```(http.ResponseWriter, *http.Request)``` como um parâmetro para ele, da seguinte maneira:
 
-```
+```go
 func main() 
 {
   http.HandleFunc("/", helloWorld)
@@ -595,11 +615,13 @@ Usaremos ```gorilla/mux``` para definir algumas rotas, como fizemos em nossa rec
 
 - 1.Instale github.com/gorilla/mux usando o comando go get, da seguinte maneira:
 
-```$ go get github.com/gorilla/mux```
+```bash
+$ go get github.com/gorilla/mux
+```
 
 - 2.Crie ```http-server-gorilla-mux-routing.go``` e copie o seguinte código:
 
-```
+```go
 package main
 import 
 (
@@ -647,23 +669,29 @@ func main()
 
 - 3.No terminal rode o seguinte comando:
 
-```$ go run http-server-gorilla-mux-routing.go```
+```bash
+$ go run http-server-gorilla-mux-routing.go
+```
 
 
 #### Como isso deve funcionar:
 Uma vez executado o programa, o servidor HTTP iniciará escutando localmente na porta 8080 e acessando ```http://localhost:8080/```, ```http://localhost:8080/post``` e ```http://localhost:8080/hello/foo``` a partir de um navegador ou linha de comando produzirá a mensagem definida na definição de manipulador correspondente. Por exemplo, execute ```http://localhost:8080/``` na linha de comando, da seguinte maneira:
 
-```$ curl -X GET -i http://localhost:8080/```
+```bash
+$ curl -X GET -i http://localhost:8080/
+```
 
 Poderíamos também executar ```http://localhost:8080/hello/foo``` a partir da linha de comando, da seguinte maneira:
 
-```$ curl -X GET -i http://localhost:8080/hello/foo```
+```bash
+$ curl -X GET -i http://localhost:8080/hello/foo
+```
 
 **Entendendo o que escrevemos**
 
 - 1.Primeiro, definimos ```GetRequestHandler``` e ```PostRequestHandler```, que simplesmente escrevem uma mensagem em um fluxo de resposta HTTP, da seguinte forma:
 
-```
+```go
 var GetRequestHandler = http.HandlerFunc
 (
   func(w http.ResponseWriter, r *http.Request) 
@@ -682,7 +710,7 @@ var PostRequestHandler = http.HandlerFunc
 
 - 2.Em seguida, definimos ```PathVariableHandler```, que extrai variáveis de caminho de solicitação, obtém o valor e grava-o em um fluxo de resposta HTTP, da seguinte maneira:
 
-```
+```go
 var PathVariableHandler = http.HandlerFunc
 (
   func(w http.ResponseWriter, r *http.Request) 
@@ -696,7 +724,7 @@ var PathVariableHandler = http.HandlerFunc
 
 - 3.Em seguida, registramos todos esses manipuladores com o roteador ```gorilla/mux``` e os instanciámos, chamando o manipulador ```NewRouter()``` do roteador mux, da seguinte forma:
 
-```
+```go
 func main() 
 {
   router := mux.NewRouter()
@@ -718,14 +746,14 @@ Vamos implementar o log usando manipuladores do Gorilla. Execute os seguintes pa
 
 - 1.Instale os pacotes ```github.com/gorilla/handlere``` e ```github.com/gorilla/mux``` usando o ```go get``` comando da seguinte forma:
 
-```
+```bash
 $ go get github.com/gorilla/handlers 
 $ go get github.com/gorilla/mux
 ```
 
 - 2.Crie ```http-server-request-logging.go``` e copie o seguinte código:
 
-```
+```go
 package main
 import 
 (
@@ -785,7 +813,9 @@ func main()
 
 - 3.Rode o seguinte comando no terminal:
 
-```$ go run http-server-request-logging.go```
+```bash
+$ go run http-server-request-logging.go
+```
 
 
 ### Como isso deve funcionar:
@@ -793,24 +823,30 @@ Assim que executarmos o programa, o servidor HTTP começará a escutar localment
 
 - Execute ```GET``` na linha de comando, da seguinte maneira:
 
-```$ curl -X GET -i http://localhost:8080/```
+```bash
+$ curl -X GET -i http://localhost:8080/
+```
 
 - Poderíamos também executar a http://localhost:8080/hello/foopartir da linha de comando, da seguinte maneira:
 
-```$ curl -X GET -i http://localhost:8080/ola/foo```
+```bash
+$ curl -X GET -i http://localhost:8080/ola/foo
+```
 
 **Entendendo o que fizemos**
 
 - 1.Primeiramente, nós importamos dois pacotes adicionais, um é os, que usamos para abrir um arquivo. O outro é ```github.com/gorilla/handlers```, que usamos para importar manipuladores de log para registrar solicitações HTTP, da seguinte maneira:
 
-```import ("net / http" "os" "github.com/gorilla/handlers" "github.com/gorilla/mux")``` 
+```go
+import ("net / http" "os" "github.com/gorilla/handlers" "github.com/gorilla/mux")
+```
 
 - 2.Em seguida, modificamos o método ```main()```. Usando ```router.Handle("/", handlers.LoggingHandler (os.Stdout,
 http.HandlerFunc (GetRequestHandler))).Methods("GET")```, envolvemos ```GetRequestHandler``` com um manipulador de criação de log do Gorilla e passamos um fluxo de saída padrão como um gravador para ele, o que significa que estamos simplesmente solicitando que registremos todas as solicitações com o URL caminho / no console no Apache Common Log Format.
 
 - 3.Em seguida, criamos um novo arquivo chamado ```server.log``` no modo somente gravação ou o abrimos, se já existir. Se houver algum erro, registre-o e saia com um código de status 1, da seguinte maneira:
 
-```
+```go
 logFile, err: = os.OpenFile ("server.log", os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0666) 
 se err! = nil 
 { 

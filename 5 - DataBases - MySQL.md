@@ -4,15 +4,19 @@ Vamos supor que você seja um desenvolvedor e queira salvar os dados do seu apli
 
 - Verifique se o MySQL está instalado e em execução localmente na porta 3306
 
-```$ ps -ef | grep 3306```
+```bash
+$ ps -ef | grep 3306
+```
 
 - 1.Instale o pacote ```github.com/go-sql-driver/mysql```, usando o comando ```go get```
 
-```$ go get github.com/go-sql-driver/mysql```
+```bash
+$ go get github.com/go-sql-driver/mysql
+```
 
 - 2.Crie o```connect-mysql.go``` em seguida, nos conectamos ao banco de dados MySQL e realizamos uma consulta SELECT para obter o nome atual do banco de dados
 
-```
+```go
 package main
 import 
 (
@@ -69,7 +73,9 @@ func main()
 
 - 3.Rode no terminal
 
-```$ go run connect-mysql.go```
+```bash
+$ go run connect-mysql.go
+```
 
 ### Como isso deve funcionar
 - Assim que executarmos o programa, o servidor HTTP começará a escutar localmente na porta ```8080```.
@@ -103,14 +109,14 @@ Antes de criar um registro, temos que criar uma tabela no banco de dados MySQL, 
 
 - 1.Instale os pacotes ```github.com/go-sql-driver/mysql``` e ```github.com/gorilla/mux```, usando o comando ```go get```
 
-```
+```bash
 $ go get github.com/go-sql-driver/mysql
 $ go get github.com/gorilla/mux
 ```
 
 - 2.Crie create-record-mysql.go. Em seguida, nos conectamos ao banco de dados MySQL e realizamos uma consulta INSERT para criar um registro de funcionário
 
-``` 
+``` go
 package main
 import 
 (
@@ -186,14 +192,16 @@ func main()
 
 - 3.Rode no terminal
 
-```$ go run create-record-mysql.go```
+```bash
+$ go run create-record-mysql.go
+```
 
 ### Como isso deve funcionar
 - Assim que executarmos o programa, o servidor HTTP começará a escutar localmente na porta ```8080```.
 
 - Executar uma solicitação ```POST``` para criar um registro de funcionário na linha de comando da seguinte maneira fornecerá o ID do último registro criado
 
-```
+```bash
 $ curl -X POST http://localhost:8080/employee/create?name=foo
 Last created record id is :: 1
 ```
@@ -209,14 +217,14 @@ Antes nós criamos um registro de funcionário no banco de dados MySQL. Agora ap
 
 - 1.Instale os pacotes ```github.com/go-sql-driver/mysql``` e ```github.com/gorilla/mux``` usando o comando ```go get```
 
-```
+```bash
 $ go get github.com/go-sql-driver/mysql
 $ go get github.com/gorilla/mux
 ```
 
 - 2.Crie ```read-record-mysql.go``` onde nos conectamos ao banco de dados MySQL, realizamos uma consulta ```SELECT``` para obter todos os funcionários do banco de dados, iterar os registros, copiar seu valor para a estrutura, adicionar todos eles a uma lista e gravá-lo em um fluxo de resposta HTTP
 
-```
+```go
 package main
 import 
 (
@@ -285,7 +293,9 @@ func main()
 
 - 3.Rode no terminal
 
-```$ go run read-record-mysql.go```
+```bash
+$ go run read-record-mysql.go
+```
 
 
 ### Como isso deve funcionar
@@ -307,14 +317,14 @@ Você criou um registro para um funcionário em um banco de dados com todos os d
 
 - 1.Instale os pacotes ```github.com/go-sql-driver/mysql``` e ```github.com/gorilla/mux``` usando o comando ```go get```
 
-```
+```bash
 $ go get github.com/go-sql-driver/mysql
 $ go get github.com/gorilla/mux
 ```
 
 - 2.Crie ```update-record-mysql.go```. Em seguida, nos conectamos ao banco de dados MySQL, atualizamos o nome de um funcionário para um ID e gravamos o número de registros atualizados em um banco de dados em um fluxo de resposta HTTP
 
-```
+```go
 package main
 import 
 (
@@ -397,7 +407,9 @@ func main()
 
 - 3.Rode no terminal
 
-```$ go run update-record-mysql.go```
+```bash
+$ go run update-record-mysql.go
+```
 
 
 ### Como isso deve funcionar
@@ -405,7 +417,7 @@ func main()
 
 - Executar uma solicitação ```PUT``` a partir da linha de comando para atualizar um registro de funcionário com o ID como 1 fornecerá o número de registros atualizados no banco de dados como uma resposta
 
-```
+```bash
 $ curl -X PUT http://localhost:8080/employee/update/1?name\=bar
 Number of rows updated in database are :: 1
 ```
@@ -421,14 +433,14 @@ Vamos imaginar que um funcionário deixou a organização e você deseja revogar
 
 - 1.Instale os pacotes ```github.com/go-sql-driver/mysql``` e ```github.com/gorilla/mux```, usando o comando ```go get```
 
-```
+```bash
 $ go get github.com/go-sql-driver/mysql
 $ go get github.com/gorilla/mux
 ```
 
 - 2.Excluindo seu primeiro registro do MySQL. Se você tem um cenário em que um funcionário deixou uma organização e você deseja que seus detalhes tenham um banco de dados. Nesse caso, podemos usar uma instrução SQL DELETE
 
-```
+```go
 package main
 import 
 (
@@ -503,7 +515,9 @@ func main()
 
 - 3.Rode no terminal
 
-```$ go run delete-record-mysql.go```
+```bash
+$ go run delete-record-mysql.go
+```
 
 
 ### Como isso deve funcionar
@@ -511,7 +525,7 @@ func main()
 
 - Executar uma solicitação DELETE da linha de comando para excluir um funcionário com o nome como barra fornecerá o número de registros excluídos do banco de dados
 
-```
+```bash
 $ curl -X DELETE http://localhost:8080/employee/delete?name\=bar
 Number of rows deleted in database are :: 1 
 ```
